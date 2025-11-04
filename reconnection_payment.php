@@ -164,470 +164,194 @@ if (isset($error_message) && isset($_POST['amount'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reconnection Payment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/reconnection.css"> <!-- Custom CSS for this page -->
     <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
-            --success: #06d6a0;
-            --danger: #ef476f;
-            --warning: #ffd166;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            color: var(--dark);
-            min-height: 100vh;
-        }
-        
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: var(--card-shadow);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--card-shadow-hover);
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border-bottom: none;
-            padding: 1.5rem 2rem;
-        }
-        
-        .card-body {
-            padding: 2rem;
-        }
-        
-        .customer-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .customer-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-right: 1rem;
-        }
-        
-        .customer-info h4 {
-            margin: 0;
-            font-weight: 600;
-        }
-        
-        .customer-info p {
-            margin: 0;
-            color: var(--gray);
-        }
-        
         .breakdown-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid var(--primary);
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
         }
-        
-        .total-due-card {
-            background: linear-gradient(135deg, #e7f3ff 0%, #d4e7ff 100%);
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
+        .total-due {
+            background: #e7f3ff;
+            border: 2px solid #007bff;
+            border-radius: 8px;
         }
-        
         .calculation-steps {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
-        
-        .step-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--light-gray);
-        }
-        
-        .step-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .step-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .step-content {
-            flex: 1;
-        }
-        
         .payment-option-card {
-            border: 2px solid var(--light-gray);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
         }
-        
         .payment-option-card:hover {
-            border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.05);
+            border-color: #007bff;
+            background-color: #f8f9fa;
         }
-        
         .payment-option-card.selected {
-            border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.1);
+            border-color: #007bff;
+            background-color: #e7f3ff;
         }
-        
         .payment-option-card input[type="radio"] {
-            margin-right: 1rem;
-            transform: scale(1.2);
+            margin-right: 10px;
         }
-        
-        .payment-option-content {
-            flex: 1;
-        }
-        
-        .payment-option-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .payment-option-description {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
-        .payment-option-amount {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-        
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-            padding: 0.75rem 1rem;
-            transition: all 0.3s;
-        }
-        
-        .form-control:focus {
-            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
-            border-color: var(--primary);
-        }
-        
-        .btn {
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #651a98 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
-        }
-        
-        .btn-secondary {
-            background: var(--light);
-            color: var(--dark);
-            border: 1px solid var(--light-gray);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--light-gray);
-            color: var(--dark);
-        }
-        
-        .alert {
-            border-radius: 12px;
-            border: none;
-            padding: 1rem 1.5rem;
-        }
-        
-        .alert-danger {
-            background: rgba(239, 71, 111, 0.1);
-            color: var(--danger);
-        }
-        
-        .alert-success {
-            background: rgba(6, 214, 160, 0.1);
-            color: #06a17a;
-        }
-        
-        .file-upload-area {
-            border: 2px dashed var(--light-gray);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s;
-            background: var(--light);
-        }
-        
-        .file-upload-area:hover {
-            border-color: var(--primary);
-            background: rgba(67, 97, 238, 0.05);
-        }
-        
-        .file-upload-icon {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-        
-        .amount-display {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
         .is-invalid {
-            border-color: var(--danger) !important;
+            border-color: #dc3545 !important;
         }
-        
         .invalid-feedback {
             display: block;
             width: 100%;
             margin-top: 0.25rem;
             font-size: 0.875em;
-            color: var(--danger);
+            color: #dc3545;
         }
-        
-        .section-title {
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--light-gray);
-            color: var(--dark);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .card-body {
-                padding: 1.5rem;
-            }
-            
-            .customer-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .customer-avatar {
-                margin-right: 0;
-                margin-bottom: 1rem;
-            }
-            
-            .payment-option-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .payment-option-amount {
-                margin-top: 0.5rem;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .card-body {
-                padding: 1rem;
-            }
-            
-            .step-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .step-icon {
-                margin-right: 0;
-                margin-bottom: 0.5rem;
-            }
-        }
-        
-        /* Smart TV optimizations */
-        @media (min-width: 1920px) {
-            .main-container {
-                max-width: 1400px;
-            }
-            
-            .card-body {
-                padding: 3rem;
-            }
-            
-            .form-control, .btn {
-                padding: 1rem 1.5rem;
-                font-size: 1.1rem;
-            }
-            
-            .section-title {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+
+/* Fix form labels and spacing */
+.form-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+
+/* Ensure form controls have proper spacing */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Fix date and time inputs */
+input[type="date"],
+input[type="time"] {
+    min-height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    width: 100%;
+}
+
+/* Improve focus states */
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #80bdff;
+    outline: 0;
+}
+
+/* Make sure all form controls are consistent */
+.form-control {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Fix the card body spacing */
+.card-body {
+    padding: 2rem;
+}
+
+/* Improve the breakdown card */
+.breakdown-card {
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+    padding: 1.5rem;
+}
+
+/* Payment option cards styling */
+.payment-option-card {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-option-card:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.payment-option-card.selected {
+    border-color: #007bff;
+    background-color: #e7f3ff;
+}
+
+/* Button spacing */
+.d-grid {
+    gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+}
+</style>
 </head>
 <body>
-<main class="cd-main-content">
-<div class="container main-container py-4">
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0"><i class="fas fa-plug me-2"></i>Reconnection Payment</h3>
+        <div class="col-md-10">
+            <div class="card mt-5">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Reconnection Payment for <?php echo htmlspecialchars($customer->full_name); ?></h3>
                 </div>
                 <div class="card-body">
-                    <!-- Customer Info -->
-                    <div class="customer-header">
-                        <div class="customer-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="customer-info">
-                            <h4><?php echo htmlspecialchars($customer->full_name); ?></h4>
-                            <p>Customer ID: <?php echo htmlspecialchars($customer_id); ?></p>
-                        </div>
-                    </div>
-                    
                     <?php if (isset($error_message)): ?>
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle me-2"></i><?php echo $error_message; ?>
-                        </div>
+                        <div class="alert alert-danger"><?php echo $error_message; ?></div>
                     <?php endif; ?>
                     
                     <?php if (isset($_SESSION['success'])): ?>
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i><?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-                        </div>
+                        <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
                     <?php endif; ?>
-
-                    <!-- Payment Summary -->
-                    <div class="total-due-card">
-                        <h4 class="mb-2">Total Amount Due</h4>
-                        <div class="amount-display">₱<?php echo number_format($total_due, 2); ?></div>
-                        <p class="mb-0 mt-2">Pay this amount to restore your service</p>
-                    </div>
 
                     <!-- Calculation Breakdown -->
                     <div class="calculation-steps">
-                        <h5 class="section-title"><i class="fas fa-calculator me-2"></i>Payment Calculation Breakdown</h5>
+                        <h5>Payment Calculation Breakdown:</h5>
                         
-                        <div class="step-item">
-                            <div class="step-icon">1</div>
-                            <div class="step-content">
-                                <div class="d-flex justify-content-between">
-                                    <span>Monthly Package Fee:</span>
-                                    <strong>₱<?php echo number_format($monthly_fee, 2); ?></strong>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Monthly Package:</span>
+                            <strong>₱<?php echo number_format($monthly_fee, 2); ?></strong>
                         </div>
                         
-                        <div class="step-item">
-                            <div class="step-icon">2</div>
-                            <div class="step-content">
-                                <div class="d-flex justify-content-between">
-                                    <span>Daily Rate Calculation:</span>
-                                    <span>₱<?php echo number_format($monthly_fee, 2); ?> ÷ <?php echo $days_in_month; ?> days = <strong>₱<?php echo number_format($daily_rate, 2); ?>/day</strong></span>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Daily Rate Calculation:</span>
+                            <span>₱<?php echo number_format($monthly_fee, 2); ?> ÷ <?php echo $days_in_month; ?> days = <strong>₱<?php echo number_format($daily_rate, 2); ?>/day</strong></span>
                         </div>
                         
-                        <div class="step-item">
-                            <div class="step-icon">3</div>
-                            <div class="step-content">
-                                <div class="d-flex justify-content-between">
-                                    <span>Overdue Period:</span>
-                                    <span><?php echo $due_date_formatted; ?> to <?php echo $today_formatted; ?> <strong>(<?php echo $overdue_days; ?> days)</strong></span>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Overdue Period:</span>
+                            <span><?php echo $due_date_formatted; ?> to <?php echo $today_formatted; ?> <strong>(<?php echo $overdue_days; ?> days)</strong></span>
                         </div>
                         
-                        <div class="step-item">
-                            <div class="step-icon">4</div>
-                            <div class="step-content">
-                                <div class="d-flex justify-content-between">
-                                    <span>Overdue Consumption:</span>
-                                    <span><?php echo $overdue_days; ?> days × ₱<?php echo number_format($daily_rate, 2); ?>/day = <strong>₱<?php echo number_format($overdue_consumption, 2); ?></strong></span>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Overdue Consumption:</span>
+                            <span><?php echo $overdue_days; ?> days × ₱<?php echo number_format($daily_rate, 2); ?>/day = <strong>₱<?php echo number_format($overdue_consumption, 2); ?></strong></span>
                         </div>
                     </div>
 
-                    <!-- Payment Breakdown -->
-                    <div class="breakdown-card">
-                        <h5 class="section-title"><i class="fas fa-receipt me-2"></i>Payment Breakdown</h5>
-                        
-                        <div class="d-flex justify-content-between mb-3">
+                    <!-- Payment Summary -->
+                    <div class="breakdown-card p-3 mb-4">
+                        <div class="d-flex justify-content-between">
                             <span>Outstanding Balance:</span>
                             <strong>₱<?php echo number_format($outstanding_balance, 2); ?></strong>
                         </div>
                         
-                        <div class="d-flex justify-content-between mb-3">
+                        <div class="d-flex justify-content-between">
                             <span>Overdue Consumption:</span>
                             <strong>₱<?php echo number_format($overdue_consumption, 2); ?></strong>
                         </div>
                         
                         <hr>
                         
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center total-due p-2">
                             <h5 class="mb-0"><strong>Total Amount Due:</strong></h5>
                             <h5 class="mb-0"><strong>₱<?php echo number_format($total_due, 2); ?></strong></h5>
                         </div>
@@ -636,44 +360,39 @@ if (isset($error_message) && isset($_POST['amount'])) {
                     <!-- Payment Options -->
                     <form action="reconnection_payment.php" method="POST" enctype="multipart/form-data" id="paymentForm">
                         <div class="mb-4">
-                            <h5 class="section-title"><i class="fas fa-credit-card me-2"></i>Select Payment Option</h5>
+                            <h5>Select Payment Option:</h5>
                             
                             <div class="payment-option-card <?php echo $payment_option === 'outstanding' ? 'selected' : ''; ?>" onclick="selectPaymentOption('outstanding')">
-                                <input type="radio" name="payment_option" value="outstanding" <?php echo $payment_option === 'outstanding' ? 'checked' : ''; ?>>
-                                <div class="payment-option-content">
-                                    <div class="payment-option-title">Outstanding Balance Only</div>
-                                    <div class="payment-option-description">Pay only the remaining balance from previous bills</div>
-                                </div>
-                                <div class="payment-option-amount">₱<?php echo number_format($outstanding_balance, 2); ?></div>
+                                <label class="d-block mb-0">
+                                    <input type="radio" name="payment_option" value="outstanding" <?php echo $payment_option === 'outstanding' ? 'checked' : ''; ?>>
+                                    <strong>Outstanding Balance Only</strong> - ₱<?php echo number_format($outstanding_balance, 2); ?>
+                                </label>
+                                <small class="text-muted">Pay only the remaining balance from previous bills</small>
                             </div>
                             
                             <div class="payment-option-card <?php echo $payment_option === 'overdue' ? 'selected' : ''; ?>" onclick="selectPaymentOption('overdue')">
-                                <input type="radio" name="payment_option" value="overdue" <?php echo $payment_option === 'overdue' ? 'checked' : ''; ?>>
-                                <div class="payment-option-content">
-                                    <div class="payment-option-title">Overdue Consumption Only</div>
-                                    <div class="payment-option-description">Pay only for the overdue period consumption</div>
-                                </div>
-                                <div class="payment-option-amount">₱<?php echo number_format($overdue_consumption, 2); ?></div>
+                                <label class="d-block mb-0">
+                                    <input type="radio" name="payment_option" value="overdue" <?php echo $payment_option === 'overdue' ? 'checked' : ''; ?>>
+                                    <strong>Overdue Consumption Only</strong> - ₱<?php echo number_format($overdue_consumption, 2); ?>
+                                </label>
+                                <small class="text-muted">Pay only for the overdue period consumption</small>
                             </div>
                             
                             <div class="payment-option-card <?php echo $payment_option === 'both' ? 'selected' : ''; ?>" onclick="selectPaymentOption('both')">
-                                <input type="radio" name="payment_option" value="both" <?php echo $payment_option === 'both' ? 'checked' : ''; ?>>
-                                <div class="payment-option-content">
-                                    <div class="payment-option-title">Both (Outstanding Balance + Overdue Consumption)</div>
-                                    <div class="payment-option-description">Pay both outstanding balance and overdue consumption</div>
-                                </div>
-                                <div class="payment-option-amount">₱<?php echo number_format($total_due, 2); ?></div>
+                                <label class="d-block mb-0">
+                                    <input type="radio" name="payment_option" value="both" <?php echo $payment_option === 'both' ? 'checked' : ''; ?>>
+                                    <strong>Both (Outstanding Balance + Overdue Consumption)</strong> - ₱<?php echo number_format($total_due, 2); ?>
+                                </label>
+                                <small class="text-muted">Pay both outstanding balance and overdue consumption</small>
                             </div>
                         </div>
 
                         <!-- Payment Form -->
                         <input type="hidden" name="customer" value="<?php echo $customer_id; ?>">
 
-                        <h5 class="section-title"><i class="fas fa-money-bill-wave me-2"></i>Payment Details</h5>
-                        
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="amount" class="form-label">Payment Amount *</label>
                                     <input type="number" name="amount" id="amount" class="form-control" 
                                            step="0.01" min="0" 
@@ -688,7 +407,7 @@ if (isset($error_message) && isset($_POST['amount'])) {
                             </div>
                             
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="payment_method" class="form-label">Payment Method *</label>
                                     <select name="payment_method" id="payment_method" class="form-control" required>
                                         <option value="">Select Payment Method</option>
@@ -704,7 +423,7 @@ if (isset($error_message) && isset($_POST['amount'])) {
 
                         <div class="row">
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="payment_date" class="form-label">Payment Date *</label>
                                     <input type="date" name="payment_date" id="payment_date" 
                                            class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
@@ -712,7 +431,7 @@ if (isset($error_message) && isset($_POST['amount'])) {
                             </div>
                             
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="payment_time" class="form-label">Payment Time *</label>
                                     <input type="time" name="payment_time" id="payment_time" 
                                            class="form-control" value="<?php echo date('H:i'); ?>" required>
@@ -720,7 +439,7 @@ if (isset($error_message) && isset($_POST['amount'])) {
                             </div>
                             
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="reference_number" class="form-label">Reference Number *</label>
                                     <input type="text" name="reference_number" id="reference_number" 
                                            class="form-control" placeholder="Enter transaction reference" required>
@@ -728,25 +447,18 @@ if (isset($error_message) && isset($_POST['amount'])) {
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Transaction Proof (Screenshot/Receipt)</label>
-                            <div class="file-upload-area" onclick="document.getElementById('screenshot').click()">
-                                <div class="file-upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <h5>Upload Proof of Payment</h5>
-                                <p class="text-muted">Click to upload screenshot of transaction or receipt photo</p>
-                                <input type="file" name="screenshot" id="screenshot" class="d-none" 
-                                       accept="image/*,.pdf">
+                        <div class="form-group mb-4">
+                            <label for="screenshot" class="form-label">Transaction Proof (Screenshot/Receipt)</label>
+                            <input type="file" name="screenshot" id="screenshot" class="form-control" 
+                                   accept="image/*,.pdf">
+                            <div class="form-text">
+                                <small>Upload proof of payment (screenshot of transaction or receipt photo)</small>
                             </div>
-                            <div id="file-name" class="mt-2 text-center"></div>
                         </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="disconnected_clients.php" class="btn btn-secondary me-md-2">Cancel</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Reconnection Request
-                            </button>
+                            <button type="submit" class="btn btn-primary">Submit Reconnection Request</button>
                         </div>
                     </form>
                 </div>
@@ -754,7 +466,7 @@ if (isset($error_message) && isset($_POST['amount'])) {
         </div>
     </div>
 </div>
-</main>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // PHP variables passed to JavaScript
@@ -768,17 +480,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const minAmountText = document.getElementById('min-amount-text');
     const amountError = document.getElementById('amount-error');
     const paymentOptions = document.querySelectorAll('input[name="payment_option"]');
-    const screenshotInput = document.getElementById('screenshot');
-    const fileNameDisplay = document.getElementById('file-name');
-    
-    // File upload display
-    screenshotInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            fileNameDisplay.innerHTML = `<span class="badge bg-primary"><i class="fas fa-file me-1"></i> ${this.files[0].name}</span>`;
-        } else {
-            fileNameDisplay.innerHTML = '';
-        }
-    });
     
     function updateRequiredAmountText(amount) {
         minAmountText.textContent = `Required: ₱${amount.toFixed(2)}`;
