@@ -70,6 +70,7 @@ $ledger = $admins->fetchPaymentHistoryByCustomer($customer_id);
                                 <th>Amount</th>
                                 <th>Paid</th>
                                 <th>Balance</th>
+                                <th>Reconnection Fee</th>
                                 <th>Status</th>
                                 <th>Paid On</th>
                             </tr>
@@ -79,9 +80,15 @@ $ledger = $admins->fetchPaymentHistoryByCustomer($customer_id);
                                 <?php foreach ($payments as $payment): ?>
                                     <tr>
                                         <td><?php echo $payment->r_month; ?></td>
-                                        <td><?php echo $payment->amount; ?></td>
+                                        <td><?php echo ($payment->r_month === 'Reconnection Fee') ? 'N/A' : $payment->amount; ?></td>
                                         <td><?php echo number_format($payment->paid, 2); ?></td>
-                                        <td><?php echo number_format($payment->balance, 2); ?></td>
+                                        <td><?php echo ($payment->r_month === 'Reconnection Fee') ? 'N/A' : number_format($payment->balance, 2); ?></td>
+                                        <td>
+                                            <?php
+                                                // Display the reconnection fee if the payment is for a reconnection
+                                                echo ($payment->r_month === 'Reconnection Fee') ? number_format($payment->amount, 2) : 'N/A';
+                                            ?>
+                                        </td>
                                         <td><?php
                                             if ($payment->status === 'Rejected') {
                                                 echo 'Rejected';
@@ -98,7 +105,7 @@ $ledger = $admins->fetchPaymentHistoryByCustomer($customer_id);
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="text-center">No payment history found.</td>
+                                    <td colspan="7" class="text-center">No payment history found.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
