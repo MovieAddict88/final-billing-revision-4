@@ -688,11 +688,11 @@ public function countDisconnectedCustomersByEmployer($employer_id, $query = null
 		 * 
 		 */
 		
-		public function addCustomer($full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $login_code, $employer_id, $due_date)
+		public function addCustomer($full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $login_code, $employer_id, $start_date, $due_date, $end_date)
 		{
-			$request = $this->dbh->prepare("INSERT INTO customers (`full_name`, `nid`, `address`, `conn_location`, `email`, `package_id`, `ip_address`, `conn_type`, `contact`, `login_code`, `employer_id`, `due_date`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
+			$request = $this->dbh->prepare("INSERT INTO customers (`full_name`, `nid`, `address`, `conn_location`, `email`, `package_id`, `ip_address`, `conn_type`, `contact`, `login_code`, `employer_id`, `start_date`, `due_date`, `end_date`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			// Do not forget to encrypt the pasword before saving
-			if ($request->execute([$full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $login_code, $employer_id, $due_date])) {
+			if ($request->execute([$full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $login_code, $employer_id, $start_date, $due_date, $end_date])) {
 				return $this->dbh->lastInsertId();
 			}
 			return false;
@@ -736,10 +736,10 @@ public function countDisconnectedCustomersByEmployer($employer_id, $query = null
 		/**
 		 * Update Customers
 		 */
-		public function updateCustomer($id, $full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $due_date)
+		public function updateCustomer($id, $full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date)
 		{
-			$request = $this->dbh->prepare("UPDATE customers SET full_name =?, nid =?, address =?, conn_location= ?, email =?, package_id =?, ip_address=?, conn_type=?, contact=?, employer_id = ?, due_date = ? WHERE id =?");
-			return $request->execute([$full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $due_date, $id]);
+			$request = $this->dbh->prepare("UPDATE customers SET full_name =?, nid =?, address =?, conn_location= ?, email =?, package_id =?, ip_address=?, conn_type=?, contact=?, employer_id = ?, start_date = ?, due_date = ?, end_date = ? WHERE id =?");
+			return $request->execute([$full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date, $id]);
 		}
 
 		public function addRemark($customer_id, $remark)

@@ -240,6 +240,8 @@
                     <td class="search"><?=number_format($customer->total_balance, 2)?></td>
                     <td class="search"><?=isset($customer->advance_payment) ? number_format($customer->advance_payment, 2) : '0.00'?></td>
 					<td class="search"><?=$customer->login_code?></td>
+					<td class="search"><?=$customer->start_date?></td>
+					<td class="search"><?=$customer->end_date?></td>
 					<td class="search"
 						<?php
 						$dueDate = $customer->due_date;
@@ -270,9 +272,7 @@
 						}
 						echo $style;
 						?>
-					><?=$customer->start_date?></td>
-					<td class="search"><?=$customer->end_date?></td>
-					<td class="search"><?=$customer->due_date?></td>
+					><?=$customer->due_date?></td>
 					<td class="search"><?=htmlspecialchars($customer->remarks)?></td>
 				</tr>
             <?php
