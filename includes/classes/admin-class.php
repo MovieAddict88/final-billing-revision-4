@@ -820,7 +820,7 @@ public function disconnectCustomer($customer_id, $disconnected_by = null)
     }
 }
 
-public function reconnectCustomer($disconnected_customer_id)
+public function reconnectCustomer($disconnected_customer_id, $restore_payments = true)
 {
     try {
         $this->dbh->beginTransaction();
@@ -859,8 +859,14 @@ public function reconnectCustomer($disconnected_customer_id)
             $customer->remarks,
         ]);
 
-        // Restore payment records from payment_history
-        $this->restoreCustomerPayments($customer->original_id);
+        if ($restore_payments) {
+            // Restore payment records from payment_history
+            $this->restoreCustomerPayments($customer->original_id);
+        } else {
+            // Clear outstanding balance
+            $request = $this->dbh->prepare("DELETE FROM disconnected_payments WHERE customer_id = ? AND status IN ('Unpaid', 'Pending')");
+            $request->execute([$customer->original_id]);
+        }
 
         // Delete from disconnected_customers table
         $request = $this->dbh->prepare("DELETE FROM disconnected_customers WHERE id = ?");
@@ -875,59 +881,6 @@ public function reconnectCustomer($disconnected_customer_id)
     }
 }
 
-/**
- * Restore customer payments and payment history when reconnecting
- */
-private function restoreCustomerPayments($customer_id)
-{
-    // Get the last payment status before disconnection from payment_history
-    $request = $this->dbh->prepare("
-        SELECT ph.*, p.amount as original_amount
-        FROM payment_history ph
-        LEFT JOIN payments p ON ph.payment_id = p.id
-        WHERE ph.customer_id = ?
-        ORDER BY ph.paid_at DESC
-        LIMIT 1
-    ");
-    $request->execute([$customer_id]);
-    $lastPayment = $request->fetch();
-
-    if ($lastPayment) {
-        // Calculate outstanding balance
-        $outstandingBalance = (float)$lastPayment->balance_after;
-        
-        if ($outstandingBalance > 0) {
-            // Create a new payment record for the outstanding balance
-            $package = $this->getPackageInfo($lastPayment->package_id);
-            $monthlyFee = $package ? (float)$package->fee : 0;
-            
-            $request = $this->dbh->prepare("
-                INSERT INTO payments 
-                (customer_id, employer_id, package_id, r_month, amount, balance, status, g_date)
-                VALUES (?, ?, ?, ?, ?, ?, 'Unpaid', NOW())
-            ");
-            
-            $currentMonth = date('F Y');
-            $request->execute([
-                $customer_id,
-                $lastPayment->employer_id,
-                $lastPayment->package_id,
-                $currentMonth,
-                $monthlyFee,
-                $outstandingBalance
-            ]);
-        }
-
-        // Generate new bill for current month
-        $this->generateCurrentMonthBill($customer_id, $lastPayment->package_id, $lastPayment->employer_id);
-    } else {
-        // If no payment history exists, create a fresh bill
-        $customer = $this->getCustomerInfo($customer_id);
-        if ($customer) {
-            $this->generateCurrentMonthBill($customer_id, $customer->package_id, $customer->employer_id);
-        }
-    }
-}
 
 /**
  * Generate current month bill for reconnected customer
@@ -935,36 +888,37 @@ private function restoreCustomerPayments($customer_id)
 private function generateCurrentMonthBill($customer_id, $package_id, $employer_id)
 {
     $package = $this->getPackageInfo($package_id);
-    if (!$package) return false;
+    if (!$package) {
+        error_log("Failed to get package info for package_id: " . $package_id);
+        return false;
+    }
 
     $monthlyFee = (float)$package->fee;
     $currentMonth = date('F Y');
 
-    // Check if bill already exists for current month
-    $request = $this->dbh->prepare("
-        SELECT id FROM payments 
-        WHERE customer_id = ? AND r_month = ? AND status = 'Unpaid'
-    ");
+    // Check if a bill for the current month already exists, regardless of status
+    $request = $this->dbh->prepare("SELECT id, status, balance FROM payments WHERE customer_id = ? AND r_month = ?");
     $request->execute([$customer_id, $currentMonth]);
-    
-    if (!$request->fetch()) {
-        // Create new bill for current month
-        $request = $this->dbh->prepare("
-            INSERT INTO payments 
-            (customer_id, employer_id, package_id, r_month, amount, balance, status, g_date)
-            VALUES (?, ?, ?, ?, ?, ?, 'Unpaid', NOW())
-        ");
+    $existingBill = $request->fetch();
+
+    if ($existingBill) {
+        // If bill exists, update it to 'Unpaid' and reset balance
+        $updateRequest = $this->dbh->prepare("UPDATE payments SET status = 'Unpaid', balance = ? WHERE id = ?");
+        return $updateRequest->execute([$monthlyFee, $existingBill->id]);
+    } else {
+        // Otherwise, create a new bill
+        $request = $this->dbh->prepare(
+            "INSERT INTO payments (customer_id, employer_id, package_id, r_month, amount, balance, status, g_date) VALUES (?, ?, ?, ?, ?, ?, 'Unpaid', NOW())"
+        );
         return $request->execute([
             $customer_id,
             $employer_id,
             $package_id,
             $currentMonth,
             $monthlyFee,
-            $monthlyFee
+            $monthlyFee,
         ]);
     }
-    
-    return true;
 }
 
 		public function updateRemark($customer_id, $remark)
@@ -2227,20 +2181,24 @@ public function approveReconnectionRequest($id)
             throw new Exception("Reconnection request not found");
         }
 
-        // Reconnect the customer (this now includes payment restoration)
-        if (!$this->reconnectCustomer($request->customer_id)) {
+        // Get disconnected customer data before reconnecting
+        $customer = $this->getDisconnectedCustomerInfo($request->customer_id);
+        if (!$customer) {
+            throw new Exception("Disconnected customer data not found");
+        }
+        $original_customer_id = $customer->original_id;
+        $package_id = $customer->package_id;
+        $employer_id = $customer->employer_id;
+
+        // Reconnect the customer but disable payment restoration
+        if (!$this->reconnectCustomer($request->customer_id, false)) {
             throw new Exception("Failed to reconnect customer");
         }
 
-        // Get the reconnected customer's original ID
-        $original_customer_id = $this->getDisconnectedCustomerOriginalId($request->customer_id);
-        if (!$original_customer_id) {
-            throw new Exception("Original customer ID not found");
+        // Generate a fresh bill for the current month
+        if (!$this->generateCurrentMonthBill($original_customer_id, $package_id, $employer_id)) {
+            throw new Exception("Failed to generate bill for current month");
         }
-
-        // Get customer info for package_id
-        $customer = $this->getCustomerInfo($original_customer_id);
-        $package_id = $customer ? $customer->package_id : null;
 
         // Record the reconnection fee payment
         $paymentRequest = $this->dbh->prepare("
