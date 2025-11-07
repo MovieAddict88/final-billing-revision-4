@@ -203,6 +203,7 @@ $monitoring_data = $admins->getEmployerMonitoringData();
     .monthly-paid .stat-value { color: var(--dark-green); }
     .monthly-unpaid .stat-value { color: var(--dark-red); }
     .total-balance .stat-value { color: var(--dark-red); }
+    .disconnected-clients .stat-value { color: var(--text-medium); }
 
 
     /* Colorful left borders */
@@ -216,6 +217,7 @@ $monitoring_data = $admins->getEmployerMonitoringData();
     .monthly-paid { border-left-color: var(--dark-green); }
     .monthly-unpaid { border-left-color: var(--dark-red); }
     .total-balance { border-left-color: var(--dark-red); }
+    .disconnected-clients { border-left-color: var(--text-medium); }
 
     .no-data {
         text-align: center;
@@ -336,10 +338,10 @@ $monitoring_data = $admins->getEmployerMonitoringData();
                         <div class="employer-status status-active"></div>
                     </div>
                     <div class="employer-details">
-                        <h3><?php echo htmlspecialchars($data->info->full_name); ?></h3>
+                        <h3><?php echo htmlspecialchars($data->info->full_name ?? ''); ?></h3>
                         <p class="location">
                             <i class="fas fa-map-marker-alt"></i>
-                            <?php echo htmlspecialchars($data->info->location); ?>
+                            <?php echo htmlspecialchars($data->info->location ?? ''); ?>
                         </p>
                     </div>
                 </div>
@@ -386,6 +388,13 @@ $monitoring_data = $admins->getEmployerMonitoringData();
                             Total Balance
                         </span>
                         <span class="stat-value">₱<?php echo number_format($data->stats['total_balance'], 2); ?></span>
+                    </div>
+                    <div class="stat-item disconnected-clients">
+                        <span class="stat-label">
+                            <i class="fas fa-user-slash"></i>
+                            Disconnected Clients
+                        </span>
+                        <span class="stat-value"><?php echo $data->stats['disconnected_clients']; ?></span>
                     </div>
                 </div>
             </div>

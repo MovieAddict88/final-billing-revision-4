@@ -156,6 +156,7 @@ public function getEmployerMonitoringData()
             u.location,
             u.profile_pic,
             COUNT(DISTINCT c.id) AS total_customers,
+            (SELECT COUNT(*) FROM disconnected_customers dc WHERE dc.employer_id = u.user_id) AS disconnected_clients,
             COUNT(DISTINCT CASE WHEN p.status = 'Paid' AND DATE_FORMAT(p.p_date, '%Y-%m') = :current_month THEN c.id END) AS paid_customers,
             COUNT(DISTINCT CASE WHEN c.id IS NOT NULL AND (p.status != 'Paid' OR p.status IS NULL) THEN c.id END) AS unpaid_customers,
             COALESCE(
@@ -199,6 +200,7 @@ public function getEmployerMonitoringData()
             ],
             'stats' => [
                 'total_customers' => (int)$row->total_customers,
+                'disconnected_clients' => (int)$row->disconnected_clients,
                 'paid_customers' => (int)$row->paid_customers,
                 'unpaid_customers' => (int)$row->unpaid_customers,
                 'monthly_paid_collection' => (float)$row->monthly_paid_collection,
