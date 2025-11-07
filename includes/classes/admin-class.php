@@ -830,8 +830,6 @@ public function disconnectCustomer($customer_id, $disconnected_by = null)
 public function reconnectCustomer($disconnected_customer_id)
 {
     try {
-        $this->dbh->beginTransaction();
-
         // Get disconnected customer data
         $request = $this->dbh->prepare("SELECT * FROM disconnected_customers WHERE id = ?");
         $request->execute([$disconnected_customer_id]);
@@ -874,14 +872,15 @@ public function reconnectCustomer($disconnected_customer_id)
             $customer->remarks . ' [Reconnected on ' . date('Y-m-d') . ']',
         ]);
 
+        // Generate current month bill
+        $this->generateCurrentMonthBill($customer->original_id, $customer->package_id, $customer->employer_id);
+
         // Delete from disconnected_customers table
         $request = $this->dbh->prepare("DELETE FROM disconnected_customers WHERE id = ?");
         $request->execute([$disconnected_customer_id]);
 
-        $this->dbh->commit();
         return true;
     } catch (Exception $e) {
-        $this->dbh->rollBack();
         error_log("Reconnect customer error: " . $e->getMessage());
         return false;
     }
@@ -1034,10 +1033,7 @@ public function approveReconnectionRequest($id)
             throw new Exception("Failed to reconnect customer");
         }
 
-        // 3. Generate current month bill
-        $this->generateCurrentMonthBill($original_customer_id, $package_id, $employer_id);
-
-        // 4. Update reconnection request status
+        // 3. Update reconnection request status
         $updateRequest = $this->dbh->prepare("UPDATE reconnection_requests SET status = 'approved' WHERE id = ?");
         $updateRequest->execute([$id]);
 
