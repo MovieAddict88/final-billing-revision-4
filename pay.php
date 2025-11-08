@@ -139,7 +139,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
 
         .statement-container {
             width: 100%;
-            margin: 0 auto;
+            margin: auto;
             padding: 20px;
             text-align: center;
         }
