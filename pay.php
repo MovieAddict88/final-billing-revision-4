@@ -202,6 +202,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
     <link rel="stylesheet" href="component/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="component/css/style.css">
     <link rel="stylesheet" href="component/css/reset.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
     <script src="component/js/modernizr.js"></script>
     <title>Statement of Account | Cornerstone</title>
 </head>
@@ -267,10 +268,6 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
                 <span><?= htmlspecialchars($info->contact) ?></span>
             </div>
 
-            <div class="account-info">
-                <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->ip_address) ?></strong></p>
-            </div>
-
             <?php if ($action == 'bill') : ?>
                 <table class="account-summary">
                     <thead>
@@ -329,6 +326,9 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
                         </tr>
                     </tbody>
                 </table>
+                <div class="account-info">
+                    <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->nid) ?></strong></p>
+                </div>
             <?php else : ?>
                 <table class="account-summary">
                     <tbody>
@@ -412,6 +412,10 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
                     <span>Php<?= htmlspecialchars(number_format($total_due, 2)) ?></span>
                 </div>
 
+                <div class="account-info">
+                    <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->nid) ?></strong></p>
+                </div>
+
                 <?php if ($action != 'bill' && (isset($total_due) && $total_due > 0)) : ?>
                     <div class="row no-print">
                         <form class="form-inline" action="post_approve.php" method="POST">
@@ -450,6 +454,28 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
                 <p><em>We appreciate your prompt payment and value you as a customer.</em></p>
             </div>
             <hr>
+            <div class="contact-info-container">
+                <div class="contact-title">
+                    <strong>Contact us:</strong>
+                </div>
+                <table>
+                    <tr>
+                        <td><strong>FB Page</strong></td>
+                        <td>:</td>
+                        <td>CORNER STONE INNOVATE TECH SOL</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Customer Service</strong></td>
+                        <td>:</td>
+                        <td>0951-6551142</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Billing Department</strong></td>
+                        <td>:</td>
+                        <td>0985-3429675</td>
+                    </tr>
+                </table>
+            </div>
         <?php } ?>
     </div>
     <script src="component/js/bootstrap-select.min.js"></script>

@@ -131,3 +131,27 @@
 .table-responsive::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+/* Styling for the 'Contact Us' section in pay.php */
+.contact-info-container {
+    margin-top: 20px;
+}
+
+.contact-title {
+    background-color: yellow;
+    padding: 5px;
+    display: inline-block;
+}
+
+.contact-info-container table {
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.contact-info-container td {
+    padding-right: 10px;
+}
+
+.contact-info-container td:first-child {
+    padding-right: 20px;
+}
