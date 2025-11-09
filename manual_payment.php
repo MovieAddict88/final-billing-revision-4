@@ -115,10 +115,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-group">
                             <label for="payment_method">Payment Method</label>
                             <select name="payment_method" id="payment_method" class="form-control" required>
-                                <option value="Manual">Manual</option>
+                                <option value="">Select Payment Method</option>
                                 <option value="GCash">GCash</option>
                                 <option value="PayMaya">PayMaya</option>
                                 <option value="Coins.ph">Coins.ph</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                                <option value="Cash">Cash</option>
                             </select>
                         </div>
                         <div class="form-group">
