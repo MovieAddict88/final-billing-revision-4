@@ -773,15 +773,16 @@ public function disconnectCustomer($customer_id, $disconnected_by = null)
         // Insert into disconnected_customers table - FIXED COLUMN NAMES
         $request = $this->dbh->prepare("
             INSERT INTO disconnected_customers 
-            (original_id, full_name, nid, address, conn_location, email, ip_address, 
+            (original_id, full_name, nid, account_number, address, conn_location, email, ip_address,
              conn_type, package_id, contact, login_code, employer_id, due_date, remarks, disconnected_by) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         $request->execute([
             $customer->id,
             $customer->full_name,
             $customer->nid,
+            $customer->account_number,
             $customer->address,
             $customer->conn_location,
             $customer->email,
@@ -850,15 +851,16 @@ public function reconnectCustomer($disconnected_customer_id)
         // Insert back into customers table with new dates
         $request = $this->dbh->prepare("
             INSERT INTO customers
-            (id, full_name, nid, address, conn_location, email, ip_address,
+            (id, full_name, nid, account_number, address, conn_location, email, ip_address,
              conn_type, package_id, contact, login_code, employer_id, start_date, due_date, end_date, remarks)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $request->execute([
             $customer->original_id,
             $customer->full_name,
             $customer->nid,
+            $customer->account_number,
             $customer->address,
             $customer->conn_location,
             $customer->email,
