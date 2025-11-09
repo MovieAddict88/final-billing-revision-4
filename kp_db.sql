@@ -96,6 +96,7 @@ CREATE TABLE `customers` (
   `id` int(11) NOT NULL,
   `full_name` varchar(50) NOT NULL,
   `nid` varchar(16) NOT NULL,
+  `account_number` varchar(255) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `conn_location` text NOT NULL,
   `email` varchar(30) NOT NULL,

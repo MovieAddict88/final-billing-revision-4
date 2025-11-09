@@ -14,6 +14,7 @@
 	if($page == 'add'){
 			$full_name = $_POST['full_name'];
 			$nid = $_POST['nid'];
+			$account_number = $_POST['account_number'];
 			$address = $_POST['address'];
 			$package = $_POST['package'];
 			$conn_location = $_POST['conn_location'];
@@ -32,7 +33,7 @@
 
 				$errors = array();
 				// Check if password are the same
-				$customer_id = $admins->addCustomer($full_name, $nid, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $login_code, $employer_id, $start_date, $due_date, $end_date);
+				$customer_id = $admins->addCustomer($full_name, $nid, $account_number, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $login_code, $employer_id, $start_date, $due_date, $end_date);
 				if ($customer_id)
 				{
 					$packageInfo = $admins->getPackageInfo($package);
@@ -57,6 +58,7 @@
 		$id = $_POST['id'];
 		$full_name = $_POST['full_name'];
 		$nid = $_POST['nid'];
+		$account_number = $_POST['account_number'];
 		$address = $_POST['address'];
 		$conn_location = $_POST['conn_location'];
 		$email = $_POST['email'];
@@ -68,7 +70,7 @@
 		$start_date = $_POST['start_date'];
 		$due_date = $_POST['due_date'];
 		$end_date = $_POST['end_date'];
-		if (!$admins->updateCustomer($id, $full_name, $nid, $address, $conn_location, $email, $package, $ip_address,  $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date))
+		if (!$admins->updateCustomer($id, $full_name, $nid, $account_number, $address, $conn_location, $email, $package, $ip_address,  $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date))
 		{	
 			//echo "$id $customername $email $full_name $address $contact";
 			echo "Sorry Data could not be Updated !";
