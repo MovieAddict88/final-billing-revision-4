@@ -62,6 +62,10 @@
                             <td><?= $customerInfo->nid ?></td>
                         </tr>
                         <tr>
+                            <th>Account Number</th>
+                            <td><?= $customerInfo->account_number ?></td>
+                        </tr>
+                        <tr>
                             <th>Address</th>
                             <td><?= $customerInfo->address ?></td>
                         </tr>

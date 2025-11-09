@@ -327,7 +327,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
                     </tbody>
                 </table>
                 <div class="account-info">
-                    <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->nid) ?></strong></p>
+                    <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->account_number) ?></strong></p>
                 </div>
             <?php else : ?>
                 <table class="account-summary">
@@ -413,7 +413,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'pay';
                 </div>
 
                 <div class="account-info">
-                    <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->nid) ?></strong></p>
+                    <p class="highlight"><strong>Account No. : <?= htmlspecialchars($info->account_number) ?></strong></p>
                 </div>
 
                 <?php if ($action != 'bill' && (isset($total_due) && $total_due > 0)) : ?>

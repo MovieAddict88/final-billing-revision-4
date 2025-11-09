@@ -109,6 +109,10 @@ $admins = new Admins($dbh);
                         <input type="text" class="form-control" id="nid" name="nid" placeholder="NID" required>
                     </div>
                     <div class="form-group">
+                        <label for="account_number">Account Number</label>
+                        <input type="text" class="form-control" id="account_number" name="account_number" placeholder="Account Number" required>
+                    </div>
+                    <div class="form-group">
                         <label for="address">Address</label>
                         <input type="textarea" class="form-control" id="address" name="address" placeholder="Address" required>
                     </div>
