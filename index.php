@@ -628,8 +628,8 @@ if ($user_role == 'employer') {
 </div>
 <div class="col-md-6">
     <div class="panel panel-default">
-        <div class="panel-heading">
-        Monthly Bill Collection : 2016
+        <div class="panel-heading" id="monthly-bill-collection-heading">
+        Monthly Bill Collection :
         </div>
         <div class="panel-body">
             <canvas id="chart2">
@@ -703,32 +703,48 @@ include 'includes/footer.php';
         });
         <?php else: ?>
         // Admin dashboard JavaScript remains the same
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-                datasets: [{
-                    label: 'Cash Collection',
-                    data: [12, 19, 3, 17, 6, 3, 20],
-                    backgroundColor: "rgba(153,255,51,0.6)"
-                }, {
-                    label: 'Balance',
-                    data: [2, 29, 5, 5, 2, 3, 10],
-                    backgroundColor: "rgba(245,0,0,0.6)"
-                }]
+        $.ajax({
+            url: "daily_collection_data.php",
+            method: "GET",
+            success: function(data) {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Cash Collection',
+                            data: data.cash_collection,
+                            backgroundColor: "rgba(153,255,51,0.6)"
+                        }, {
+                            label: 'Balance',
+                            data: data.balance,
+                            backgroundColor: "rgba(245,0,0,0.6)"
+                        }]
+                    }
+                });
             }
         });
-        var ctx = document.getElementById('chart2').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Monthly Bill Collection',
-                    data: [50000, 60000, 30000, 45000, 48000, 38000, 80000, 50000, 0],
-                    backgroundColor: "rgba(0,255,51,0.6)"
-                }]
+
+        $.ajax({
+            url: "monthly_billing_data.php",
+            method: "GET",
+            success: function(data) {
+                var currentYear = new Date().getFullYear();
+                $('#monthly-bill-collection-heading').text('Monthly Bill Collection : ' + currentYear);
+
+                var ctx = document.getElementById('chart2').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Monthly Bill Collection',
+                            data: data.bill_collection,
+                            backgroundColor: "rgba(0,255,51,0.6)"
+                        }]
+                    }
+                });
             }
         });
 

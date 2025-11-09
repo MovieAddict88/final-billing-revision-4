@@ -2050,4 +2050,89 @@ public function getDisconnectedCustomerInfo($id)
         $request = $this->dbh->prepare("UPDATE reconnection_requests SET status = 'rejected' WHERE id = ?");
         return $request->execute([$id]);
     }
+
+    public function fetchDailyCollection()
+    {
+        // Initialize arrays for the last 7 days
+        $days = [];
+        $collections = [];
+        $balances = []; // Expenses
+
+        for ($i = 6; $i >= 0; $i--) {
+            $date = date('Y-m-d', strtotime("-$i days"));
+            $day_name = date('D', strtotime($date));
+            $days[] = $day_name;
+            $collections[$day_name] = 0;
+            $balances[$day_name] = 0;
+        }
+
+        // Fetch cash collections for the last 7 days
+        $request_collections = $this->dbh->prepare("
+            SELECT DATE_FORMAT(created_at, '%a') AS day, SUM(amount) AS total
+            FROM cash_collection
+            WHERE created_at >= CURDATE() - INTERVAL 6 DAY
+            GROUP BY DATE(created_at)
+        ");
+
+        if ($request_collections->execute()) {
+            $results = $request_collections->fetchAll();
+            foreach ($results as $row) {
+                // MySQL's %a returns 'Sat', 'Sun', etc. which matches date('D')
+                $collections[$row->day] = (float)$row->total;
+            }
+        }
+
+        // Fetch cash expenses (balances) for the last 7 days
+        $request_balances = $this->dbh->prepare("
+            SELECT DATE_FORMAT(created_at, '%a') AS day, SUM(amount) AS total
+            FROM cash_expanse
+            WHERE created_at >= CURDATE() - INTERVAL 6 DAY
+            GROUP BY DATE(created_at)
+        ");
+
+        if ($request_balances->execute()) {
+            $results = $request_balances->fetchAll();
+            foreach ($results as $row) {
+                $balances[$row->day] = (float)$row->total;
+            }
+        }
+
+        return [
+            'labels' => $days,
+            'cash_collection' => array_values($collections),
+            'balance' => array_values($balances)
+        ];
+    }
+
+    public function fetchMonthlyBillCollection()
+    {
+        $year = date('Y');
+        // Initialize arrays for all 12 months
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $collections = array_fill_keys($months, 0);
+
+        // Fetch total paid amounts grouped by month for the current year
+        $request = $this->dbh->prepare("
+            SELECT DATE_FORMAT(paid_at, '%b') AS month, SUM(paid_amount) AS total
+            FROM payment_history
+            WHERE YEAR(paid_at) = :year
+            GROUP BY MONTH(paid_at)
+            ORDER BY MONTH(paid_at)
+        ");
+
+        if ($request->execute(['year' => $year])) {
+            $results = $request->fetchAll();
+            foreach ($results as $row) {
+                // MySQL's %b returns 'Jan', 'Feb', etc. which matches our keys
+                if (array_key_exists($row->month, $collections)) {
+                    $collections[$row->month] = (float)$row->total;
+                }
+            }
+        }
+
+        return [
+            'labels' => $months,
+            'bill_collection' => array_values($collections)
+        ];
+    }
 }
