@@ -166,14 +166,16 @@
     }
 	function delData(del_id){
 		var id = del_id;
-		$.ajax({
-			method:"POST",
-			url: "user_approve.php?p=del",
-			data: "id="+id,
-			success: function (data){
-				viewData();
-			}
-		});
+		if(confirm("Are you sure you want to delete this user?")){
+			$.ajax({
+				method:"POST",
+				url: "user_approve.php?p=del",
+				data: "id="+id,
+				success: function (data){
+					viewData();
+				}
+			});
+		}
 	}
 	function updateData(str){
 		var user_id = str;
