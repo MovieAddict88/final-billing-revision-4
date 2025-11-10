@@ -65,9 +65,11 @@ if (isset($results) && sizeof($results) > 0) {
                     <?php } else { ?>
                         <button class="btn btn-default" disabled>Pending</button>
                     <?php }
-                } else { ?>
-                    <a href="reconnection_payment.php?customer=<?= $result->id ?>" class="btn btn-warning">Request Reconnection</a>
-                <?php } ?>
+                } else {
+                    if ($user_role !== 'admin') { ?>
+                        <a href="reconnection_payment.php?customer=<?= $result->id ?>" class="btn btn-warning">Request Reconnection</a>
+                    <?php }
+                } ?>
             </td>
         </tr>
     <?php }
