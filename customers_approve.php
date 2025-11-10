@@ -192,20 +192,44 @@
 						<button type="submit" id="delete" onclick="delData(<?=$customer->id ?>)" class="btn btn-warning btn-sm btn-action">DELETE</button>
 						<button type="button" class="btn btn-primary btn-sm btn-action" onclick="openRemarkModal(<?=$customer->id?>, '<?=htmlspecialchars($customer->remarks)?>')">REMARK</button>
 						<?php
-						$isOverdue = false;
+						$showDisconnect = false;
 						$dueDate = $customer->due_date;
+						$endDate = $customer->end_date;
 						$status = $admins->getCustomerStatus($customer->id);
-						if ($status != 'Paid' && $dueDate) {
+						$style = ''; // Initialize style
+
+						if ($status == 'Paid') {
+							$style = 'style="background-color: #D4EFDF;"'; // Light Green for paid
+						} else if ($dueDate && $endDate) {
 							$today = new DateTime();
 							$dueDateObj = new DateTime($dueDate);
+							$endDateObj = new DateTime($endDate);
 							$today->setTime(0, 0, 0);
 							$dueDateObj->setTime(0, 0, 0);
+							$endDateObj->setTime(0, 0, 0);
 
-							if ($dueDateObj < $today) {
-								$isOverdue = true;
+							// Logic is active only after the end date has passed.
+							if ($today > $endDateObj) {
+								if ($dueDateObj < $today) {
+									$showDisconnect = true; // Overdue
+									$style = 'style="background-color: #8B0000; color: white;"'; // Dark Red
+								} else {
+									$interval = $today->diff($dueDateObj);
+									$days = $interval->days;
+
+									if ($days == 4) {
+										$showDisconnect = true;
+										$style = 'style="background-color: #FADBD8;"'; // Red
+									} elseif ($days == 2 || $days == 1) {
+										$style = 'style="background-color: #FDEBD0;"'; // Orange
+									} else { // Includes days 0, 3, and > 4
+										$style = 'style="background-color: #D6EAF8;"'; // Blue
+									}
+								}
 							}
 						}
-						if ($isOverdue): ?>
+
+						if ($showDisconnect): ?>
 						<a href="disconnect_customer.php?customer_id=<?=$customer->id?>" class="btn btn-danger btn-sm btn-action">DISCONNECT</a>
 						<?php endif; ?>
 					</td>
@@ -246,32 +270,6 @@
 					<td class="search"><?=$customer->end_date?></td>
 					<td class="search"
 						<?php
-						$dueDate = $customer->due_date;
-						$status = $admins->getCustomerStatus($customer->id);
-						$style = '';
-						if ($status == 'Paid') {
-							$style = 'style="background-color: #D4EFDF;"'; // Light Green
-						} else if ($dueDate) {
-							$today = new DateTime();
-							$dueDateObj = new DateTime($dueDate);
-							$today->setTime(0,0,0);
-							$dueDateObj->setTime(0,0,0);
-
-							if ($dueDateObj < $today) {
-								$style = 'style="background-color: #8B0000; color: white;"'; // Dark Red for overdue
-							} else {
-								$interval = $today->diff($dueDateObj);
-								$days = $interval->days;
-
-								if ($days <= 3) {
-									$style = 'style="background-color: #FADBD8;"'; // Light Red
-								} elseif ($days <= 7) {
-									$style = 'style="background-color: #FDEBD0;"'; // Light Orange
-								} else {
-									$style = 'style="background-color: #D6EAF8;"'; // Light Blue
-								}
-							}
-						}
 						echo $style;
 						?>
 					><?=$customer->due_date?></td>
