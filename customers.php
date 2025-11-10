@@ -361,4 +361,11 @@ $admins = new Admins($dbh);
         $('#remark').val(remarks);
         $('#add_remark_modal').modal('show');
     }
+
+    // Delegated event listener for remark buttons
+    $('#grid-basic').on('click', '.remark-btn', function() {
+        var customer_id = $(this).data('customer-id');
+        var remarks = $(this).data('remarks');
+        openRemarkModal(customer_id, remarks);
+    });
 </script>
