@@ -121,6 +121,10 @@
 												<input type="text" class="form-control" id="nid-<?=$customer->id?>"  value="<?=$customer->nid?>" required>
 											</div>
 											<div class="form-group">
+												<label for="account_number">Account Number</label>
+												<input type="text" class="form-control" id="acn-<?=$customer->id?>"  value="<?=$customer->account_number?>" required>
+											</div>
+											<div class="form-group">
 												<label for="address">Address</label>
 												<input type="text" class="form-control" id="ad-<?=$customer->id?>"  value="<?=$customer->address?>" required>
 											</div>
