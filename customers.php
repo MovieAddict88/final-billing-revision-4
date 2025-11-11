@@ -279,6 +279,7 @@ $admins = new Admins($dbh);
         var id = str;
         var full_name = $('#fnm-'+str).val();
         var nid = $('#nid-'+str).val();
+        var account_number = $('#acn-'+str).val();
         var address = $('#ad-'+str).val();
         var package = $('#pk-'+str).val();
         var conn_location = $('#conn_loc-'+str).val();
@@ -294,7 +295,7 @@ $admins = new Admins($dbh);
         $.ajax({
             method:"POST",
             url: "customers_approve.php?p=edit",
-            data: "full_name="+full_name+"&nid="+nid+"&address="+address+"&conn_location="+conn_location+"&email="+email+"&package="+package+"&ip_address="+ip_address+"&conn_type="+conn_type+"&contact="+contact+"&employer="+employer+"&id="+id+"&start_date="+start_date+"&due_date="+due_date+"&end_date="+end_date,
+            data: "full_name="+full_name+"&nid="+nid+"&account_number="+account_number+"&address="+address+"&conn_location="+conn_location+"&email="+email+"&package="+package+"&ip_address="+ip_address+"&conn_type="+conn_type+"&contact="+contact+"&employer="+employer+"&id="+id+"&start_date="+start_date+"&due_date="+due_date+"&end_date="+end_date,
             success: function (data){
                 viewData();
             }
