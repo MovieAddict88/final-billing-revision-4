@@ -131,12 +131,13 @@
 											<div class="form-group">
 											<label for="package">Select Package</label>
 												<select class="form-control form-control-sm" name="package" id="pk-<?=$customer->id?>">
-												<option value='<?=$customer->package_id?>'><?=$package_name?></option>
 												<?php 
 													$packages = $admins->getPackages();
 													if (isset($packages) && sizeof($packages) > 0){ 
-														foreach ($packages as $package) { ?>
-														<option value='<?=$package->id?>'><?=$package->name?></option>
+														foreach ($packages as $package) {
+															$selected = ($package->id == $customer->package_id) ? 'selected' : '';
+														?>
+														<option value='<?=$package->id?>' <?=$selected?>><?=$package->name?></option>
 												<?php }} ?>
 												</select>
 											</div>

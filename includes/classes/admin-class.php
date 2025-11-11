@@ -744,8 +744,16 @@ public function countCustomersByEmployer($employer_id)
      */
     public function updateCustomer($id, $full_name, $nid, $account_number, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date)
     {
+        $customer = $this->getCustomerInfo($id);
         $request = $this->dbh->prepare("UPDATE customers SET full_name =?, nid =?, account_number =?, address =?, conn_location= ?, email =?, package_id =?, ip_address=?, conn_type=?, contact=?, employer_id = ?, start_date = ?, due_date = ?, end_date = ? WHERE id =?");
-        return $request->execute([$full_name, $nid, $account_number, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date, $id]);
+        $updated = $request->execute([$full_name, $nid, $account_number, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date, $id]);
+        if ($updated && $customer->package_id != $package) {
+            $packageInfo = $this->getPackageInfo($package);
+            $amount = $packageInfo->fee;
+            $request = $this->dbh->prepare("UPDATE payments SET amount = ?, balance = ? WHERE customer_id = ? AND status = 'Unpaid' ORDER BY id DESC LIMIT 1");
+            $request->execute([$amount, $amount, $id]);
+        }
+        return $updated;
     }
 
     public function addRemark($customer_id, $remark)
