@@ -748,10 +748,29 @@ public function countCustomersByEmployer($employer_id)
         $request = $this->dbh->prepare("UPDATE customers SET full_name =?, nid =?, account_number =?, address =?, conn_location= ?, email =?, package_id =?, ip_address=?, conn_type=?, contact=?, employer_id = ?, start_date = ?, due_date = ?, end_date = ? WHERE id =?");
         $updated = $request->execute([$full_name, $nid, $account_number, $address, $conn_location, $email, $package, $ip_address, $conn_type, $contact, $employer_id, $start_date, $due_date, $end_date, $id]);
         if ($updated && $customer->package_id != $package) {
+            // Get the new package info
             $packageInfo = $this->getPackageInfo($package);
-            $amount = $packageInfo->fee;
-            $request = $this->dbh->prepare("UPDATE payments SET amount = ?, balance = ? WHERE customer_id = ? AND status = 'Unpaid' ORDER BY id DESC LIMIT 1");
-            $request->execute([$amount, $amount, $id]);
+            $newAmount = $packageInfo->fee;
+
+            // Find the most recent unpaid or partially paid bill
+            $billRequest = $this->dbh->prepare("SELECT * FROM payments WHERE customer_id = ? AND status != 'Paid' ORDER BY id DESC LIMIT 1");
+            $billRequest->execute([$id]);
+            $bill = $billRequest->fetch();
+
+            if ($bill) {
+                // Calculate what was already paid on this bill
+                $alreadyPaid = (float)$bill->amount - (float)$bill->balance;
+
+                // Calculate the new balance based on the new package price
+                $newBalance = (float)$newAmount - $alreadyPaid;
+
+                // Ensure the balance is not negative
+                $newBalance = max(0, $newBalance);
+
+                // Update the bill with the new amount and new balance
+                $updateRequest = $this->dbh->prepare("UPDATE payments SET amount = ?, balance = ? WHERE id = ?");
+                $updateRequest->execute([$newAmount, $newBalance, $bill->id]);
+            }
         }
         return $updated;
     }
